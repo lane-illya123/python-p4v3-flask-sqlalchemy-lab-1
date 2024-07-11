@@ -21,6 +21,36 @@ def index():
     return make_response(body, 200)
 
 # Add views here
+@app.route('/earthquakes/<int:id>')
+def earthquakes_by_id(id):
+    earthquake = Earthquake.query.filter(Earthquake.id == id).first()
+
+    if earthquake:
+        body = {'id': earthquake.id,
+                'magnitude': earthquake.magnitude,
+                'location': earthquake.location,
+                'year': earthquake.year}
+                
+        status = 200   
+    else:
+        body = {'message': f'Earthquake {id} not found.'}
+        status = 404
+    return make_response(body, status)
+
+@app.route('/earthquakes/magnitude/<float:magnitude>')
+def earthquakes_by_magnitude(magnitude):
+    earthquakes = []  # array to store a dictionary for each earthquake
+    for earthquake in Earthquake.query.filter( Earthquake.magnitude >= magnitude).all():
+        earthquakes_dict = {'id': earthquake.id,
+                    'magnitude': earthquake.magnitude,
+                    'location' : earthquake.location,
+                    'year' : earthquake.year
+                    }
+        earthquakes.append(earthquakes_dict)
+    body = {'count': len(earthquakes),
+            'quakes': earthquakes
+            }
+    return make_response(body, 200)
 
 
 if __name__ == '__main__':
